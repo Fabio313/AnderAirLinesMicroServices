@@ -1,4 +1,4 @@
-namespace APIUsuarios.Utils
+namespace APIFuncao.Utils
 {
     public class ProjMongoDotnetDatabaseSettings : IProjMongoDotnetDatabaseSettings
     {

@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
 using APIAeronave.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using Newtonsoft.Json;
 
 namespace APIAeronave.Controllers
 {
@@ -50,8 +53,24 @@ namespace APIAeronave.Controllers
         }
 
         [HttpPost]
-        public ActionResult<Aeronave> Create(Aeronave person)
+        public async Task<ActionResult<Aeronave>> CreateAsync(Aeronave person)
         {
+            HttpClient APIConnection = new HttpClient();
+            try
+            {
+                HttpResponseMessage user = await APIConnection.GetAsync("https://localhost:44385/api/Usuario/busca?login=" + person.LoginUser);
+                var usuario = JsonConvert.DeserializeObject<Usuario>(await user.Content.ReadAsStringAsync());
+
+                if (usuario == null)
+                    return NotFound("Este usuario não existe");
+                if (usuario.Funcao.Nome != "Administrador")
+                    return BadRequest("Este usuario nao tem autorização para cadastrar usuarios");
+                ;
+            }
+            catch
+            {
+                return NotFound("API DE USUARIOS ESTA FORA DO AR");
+            }
             if (!CodigoService.VerificaAeronaveSigla(person.Codigo, _aeronaveService))
                 return BadRequest("Já existe aeronave com a sigla digitada");
 

@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using APIUsuarios.Services;
-using APIUsuarios.Utils;
+using APIFuncao.Services;
+using APIFuncao.Utils;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -15,7 +15,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 
-namespace APIUsuarios
+namespace APIFuncao
 {
     public class Startup
     {
@@ -33,7 +33,7 @@ namespace APIUsuarios
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "APIUsuarios", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "APIFuncao", Version = "v1" });
             });
 
             services.Configure<ProjMongoDotnetDatabaseSettings>(
@@ -42,7 +42,7 @@ namespace APIUsuarios
             services.AddSingleton<IProjMongoDotnetDatabaseSettings>(sp =>
                 sp.GetRequiredService<IOptions<ProjMongoDotnetDatabaseSettings>>().Value);
 
-            services.AddSingleton<UsuarioService>();
+            services.AddSingleton<FuncaoService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,7 +52,7 @@ namespace APIUsuarios
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "APIUsuarios v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "APIFuncao v1"));
             }
 
             app.UseHttpsRedirection();

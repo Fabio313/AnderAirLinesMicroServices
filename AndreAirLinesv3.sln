@@ -21,7 +21,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APIPassagem", "APIPassagem\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APIAirportDapper", "APIAirportDapper\APIAirportDapper.csproj", "{C14D617E-A255-42E9-81A4-10FC34E4A554}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "APIUsuarios", "APIUsuarios\APIUsuarios.csproj", "{C4D802AE-D3EA-4BFB-9B7B-52FD43C07BB9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APIUsuarios", "APIUsuarios\APIUsuarios.csproj", "{C4D802AE-D3EA-4BFB-9B7B-52FD43C07BB9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "APIFuncao", "APIFuncao\APIFuncao.csproj", "{5B2D7772-1C08-4FAD-A5E2-A8728F66C67D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +71,10 @@ Global
 		{C4D802AE-D3EA-4BFB-9B7B-52FD43C07BB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4D802AE-D3EA-4BFB-9B7B-52FD43C07BB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C4D802AE-D3EA-4BFB-9B7B-52FD43C07BB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B2D7772-1C08-4FAD-A5E2-A8728F66C67D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B2D7772-1C08-4FAD-A5E2-A8728F66C67D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B2D7772-1C08-4FAD-A5E2-A8728F66C67D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B2D7772-1C08-4FAD-A5E2-A8728F66C67D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

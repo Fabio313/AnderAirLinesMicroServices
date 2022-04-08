@@ -34,6 +34,7 @@ namespace Models
             Uf = uf;
             Complemento = complemento;
             Pais = "Brasil";
+            Continente = "America do Sul";
         }
     }
 }

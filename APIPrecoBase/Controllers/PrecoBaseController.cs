@@ -56,6 +56,21 @@ namespace APIPrecoBase.Controllers
         public async Task<ActionResult<PrecoBase>> CreateAsync(PrecoBase precobase)
         {
             HttpClient APIConnection = new HttpClient();
+            try
+            {
+                HttpResponseMessage user = await APIConnection.GetAsync("https://localhost:44385/api/Usuario/busca?login=" + precobase.LoginUser);
+                var usuario = JsonConvert.DeserializeObject<Usuario>(await user.Content.ReadAsStringAsync());
+
+                if (usuario == null)
+                    return NotFound("Este usuario não existe");
+                if (usuario.Funcao.Nome != "Administrador")
+                    return BadRequest("Este usuario nao tem autorização para cadastrar precobase");
+                ;
+            }
+            catch
+            {
+                return NotFound("API DE USUARIOS ESTA FORA DO AR");
+            }
 
             try
             {
