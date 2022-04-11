@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading.Tasks;
 using APIAeroporto.Service;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.Services;
@@ -54,47 +52,44 @@ namespace APIAeroporto.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Aeroporto>> CreateAsync(Aeroporto person)
+        public async Task<ActionResult<Aeroporto>> CreateAsync(Aeroporto aeroporto)
         {
-            HttpClient APIConnection = new HttpClient();
             try
             {
-                HttpResponseMessage user = await APIConnection.GetAsync("https://localhost:44385/api/Usuario/busca?login=" + person.LoginUser);
-                var usuario = JsonConvert.DeserializeObject<Usuario>(await user.Content.ReadAsStringAsync());
-
-                if (usuario == null)
+                var usuario = await ConsultaAPI.BuscaUsuarioAsync(aeroporto.LoginUser);
+                if (usuario.Login == null)
                     return NotFound("Este usuario não existe");
                 if (usuario.Funcao.Nome != "Administrador")
-                    return BadRequest("Este usuario nao tem autorização para cadastrar usuarios");
-                ;
+                    return BadRequest("Este usuario nao tem autorização para cadastrar precobase");
             }
             catch
             {
                 return NotFound("API DE USUARIOS ESTA FORA DO AR");
             }
 
-            if (!SiglaService.VerificaAeroportoSigla(person.Sigla, _aeroportoService))
+            if (!SiglaService.VerificaAeroportoSigla(aeroporto.Sigla, _aeroportoService))
                 return BadRequest("Já existe um aeroporto com a sigla escolhida");
 
-            var end = await VerificaCep.CEPVerify(person.Endereco.Cep);
+            var end = await VerificaCep.CEPVerify(aeroporto.Endereco.Cep);
             if (end != null)
             {
-                int num = person.Endereco.Numero;
-                person.Endereco = new Endereco(end.Localidade, end.Logradouro, end.Bairro, end.Uf, end.Complemento, end.Cep);
-                person.Endereco.Numero = num;
+                int num = aeroporto.Endereco.Numero;
+                aeroporto.Endereco = new Endereco(end.Localidade, end.Logradouro, end.Bairro, end.Uf, end.Complemento, end.Cep);
+                aeroporto.Endereco.Numero = num;
             }
 
-            var airp = await AirportsQuery.GetAirportAsync(person.Sigla);
-            if (airp != null)
+            var airport = await AirportsQuery.GetAirportAsync(aeroporto.Sigla);
+            if (airport != null)
             {
-                person.Endereco.Localidade = airp.City;
-                person.Endereco.Continente = airp.Continent;
-                person.Endereco.Pais = airp.Country;
+                aeroporto.Endereco.Localidade = airport.City;
+                aeroporto.Endereco.Continente = airport.Continent;
+                aeroporto.Endereco.Pais = airport.Country;
             }
 
-            _aeroportoService.Create(person);
+            ConsultaAPI.RegistraLog(new Log(aeroporto.LoginUser, null, JsonConvert.SerializeObject(aeroporto), "Create"));
+            _aeroportoService.Create(aeroporto);
 
-            return CreatedAtRoute("GetCliente", new { id = person.Id.ToString() }, person);
+            return CreatedAtRoute("GetCliente", new { id = aeroporto.Id.ToString() }, aeroporto);
         }
 
         [HttpPut("{id:length(24)}")]
@@ -107,6 +102,7 @@ namespace APIAeroporto.Controllers
                 return NotFound();
             }
 
+            ConsultaAPI.RegistraLog(new Log(personIn.LoginUser, JsonConvert.SerializeObject(cliente), JsonConvert.SerializeObject(personIn), "Update"));
             _aeroportoService.Update(id, personIn);
 
             return NoContent();
@@ -122,6 +118,7 @@ namespace APIAeroporto.Controllers
                 return NotFound();
             }
 
+            ConsultaAPI.RegistraLog(new Log(person.LoginUser, JsonConvert.SerializeObject(person), null, "Delete"));
             _aeroportoService.Remove(person.Id);
 
             return NoContent();

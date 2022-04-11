@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading.Tasks;
 using APIPrecoBase.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using Models.Services;
 using Newtonsoft.Json;
 
 namespace APIPrecoBase.Controllers
@@ -55,17 +54,13 @@ namespace APIPrecoBase.Controllers
         [HttpPost]
         public async Task<ActionResult<PrecoBase>> CreateAsync(PrecoBase precobase)
         {
-            HttpClient APIConnection = new HttpClient();
             try
             {
-                HttpResponseMessage user = await APIConnection.GetAsync("https://localhost:44385/api/Usuario/busca?login=" + precobase.LoginUser);
-                var usuario = JsonConvert.DeserializeObject<Usuario>(await user.Content.ReadAsStringAsync());
-
-                if (usuario == null)
+                var usuario = await ConsultaAPI.BuscaUsuarioAsync(precobase.LoginUser);
+                if (usuario.Login == null)
                     return NotFound("Este usuario não existe");
                 if (usuario.Funcao.Nome != "Administrador")
                     return BadRequest("Este usuario nao tem autorização para cadastrar precobase");
-                ;
             }
             catch
             {
@@ -74,30 +69,22 @@ namespace APIPrecoBase.Controllers
 
             try
             {
-                HttpResponseMessage aeroporto = await APIConnection.GetAsync("https://localhost:44321/api/Aeroporto/busca?sigla=" + precobase.Origem.Sigla);
-                var origem = JsonConvert.DeserializeObject<Aeroporto>(await aeroporto.Content.ReadAsStringAsync());
-                if (origem.Sigla == null)
+                var origem = await ConsultaAPI.BuscaAeroportoAsync(precobase.Origem.Sigla);
+                if (origem == null)
                     return NotFound("Não existe aeroporto com a sigla de origem escolhida!");
                 precobase.Origem = origem;
-            }
-            catch
-            {
-                return NotFound("API DOS AEROPORTOS ESTA FORA DO AR");
-            }
 
-            try
-            {
-                HttpResponseMessage aeroporto = await APIConnection.GetAsync("https://localhost:44321/api/Aeroporto/busca?sigla=" + precobase.Destino.Sigla);
-                var destino = JsonConvert.DeserializeObject<Aeroporto>(await aeroporto.Content.ReadAsStringAsync());
-                if (destino.Sigla == null)
+                var destino = await ConsultaAPI.BuscaAeroportoAsync(precobase.Destino.Sigla);
+                if (destino == null)
                     return NotFound("Não existe aeroporto com a sigla de destino escolhida!");
                 precobase.Destino = destino;
             }
             catch
             {
-                return NotFound("API DOS AEROPORTOS ESTA FORA DO AR");
+                return StatusCode(408, "API DOS AEROPORTOS ESTA FORA DO AR");
             }
 
+            ConsultaAPI.RegistraLog(new Log(precobase.LoginUser, null, JsonConvert.SerializeObject(precobase), "Create"));
             _precoBaseService.Create(precobase);
 
             return CreatedAtRoute("GetCliente", new { id = precobase.Id.ToString() }, precobase);
@@ -113,6 +100,7 @@ namespace APIPrecoBase.Controllers
                 return NotFound();
             }
 
+            ConsultaAPI.RegistraLog(new Log(personIn.LoginUser, JsonConvert.SerializeObject(cliente), JsonConvert.SerializeObject(personIn), "Update"));
             _precoBaseService.Update(id, personIn);
 
             return NoContent();
@@ -128,6 +116,7 @@ namespace APIPrecoBase.Controllers
                 return NotFound();
             }
 
+            ConsultaAPI.RegistraLog(new Log(person.LoginUser, JsonConvert.SerializeObject(person), null, "Delete"));
             _precoBaseService.Remove(person.Id);
 
             return NoContent();

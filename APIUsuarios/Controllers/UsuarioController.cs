@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading.Tasks;
 using APIUsuarios.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.Services;
@@ -54,52 +52,48 @@ namespace APIUsuarios.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Usuario>> CreateAsync(Usuario person)
+        public async Task<ActionResult<Usuario>> CreateAsync(Usuario usuario)
         {
-            HttpClient APIConnection = new HttpClient();
             try
             {
-                HttpResponseMessage user = await APIConnection.GetAsync("https://localhost:44385/api/Usuario/busca?login=" + person.LoginUser);
-                var usuario = JsonConvert.DeserializeObject<Usuario>(await user.Content.ReadAsStringAsync());
-
-                if (usuario == null)
+                var user = await ConsultaAPI.BuscaUsuarioAsync(usuario.LoginUser);
+                if (user.Login == null)
                     return NotFound("Este usuario não existe");
-                if (usuario.Funcao.Nome != "Administrador")
-                    return BadRequest("Este usuario nao tem autorização para cadastrar usuarios");
-;            }
+                if (user.Funcao.Nome != "Administrador")
+                    return BadRequest("Este usuario nao tem autorização para cadastrar precobase");
+            }
             catch
             {
                 return NotFound("API DE USUARIOS ESTA FORA DO AR");
             }
 
-            if (!LoginService.VerificaUsuarioLogin(person.Login, _usuarioService))
+            if (!LoginService.VerificaUsuarioLogin(usuario.Login, _usuarioService))
                 return BadRequest("Login ja esta sendo utlizado!");
 
             try
             {
-                HttpResponseMessage funcao = await APIConnection.GetAsync("https://localhost:44386/api/Aeronave/busca?login=" + person.Funcao.Nome);
-                var funcaoObject = JsonConvert.DeserializeObject<Funcao>(await funcao.Content.ReadAsStringAsync());
-
-                if (funcaoObject == null)
+                var funcao = await ConsultaAPI.BuscaFuncaoAsync(usuario.Funcao.Nome);
+                if (funcao == null)
                     return NotFound("Esta função não existe");
-                person.Funcao = funcaoObject;
+                usuario.Funcao = funcao;
             }
             catch
             {
                 return NotFound("API DAS FUNÇÕES ESTA FORA DO AR");
             }
 
-            var end = await VerificaCep.CEPVerify(person.Endereco.Cep);
+            var end = await VerificaCep.CEPVerify(usuario.Endereco.Cep);
             if (end.Localidade != null)
             {
-                int num = person.Endereco.Numero;
-                person.Endereco = new Endereco(end.Localidade, end.Logradouro, end.Bairro, end.Uf, end.Complemento, end.Cep);
-                person.Endereco.Numero = num;
+                int num = usuario.Endereco.Numero;
+                usuario.Endereco = new Endereco(end.Localidade, end.Logradouro, end.Bairro, end.Uf, end.Complemento, end.Cep);
+                usuario.Endereco.Numero = num;
             }
 
-            _usuarioService.Create(person);
+            ConsultaAPI.RegistraLog(new Log(usuario.LoginUser, null, JsonConvert.SerializeObject(usuario), "Create"));
+            _usuarioService.Create(usuario);
 
-            return CreatedAtRoute("GetCliente", new { id = person.Id.ToString() }, person);
+            return CreatedAtRoute("GetCliente", new { id = usuario.Id.ToString() }, usuario);
         }
 
         [HttpPut("{id:length(24)}")]
@@ -112,6 +106,7 @@ namespace APIUsuarios.Controllers
                 return NotFound();
             }
 
+            ConsultaAPI.RegistraLog(new Log(personIn.LoginUser, JsonConvert.SerializeObject(cliente), JsonConvert.SerializeObject(personIn), "Update"));
             _usuarioService.Update(id, personIn);
 
             return NoContent();
@@ -127,6 +122,7 @@ namespace APIUsuarios.Controllers
                 return NotFound();
             }
 
+            ConsultaAPI.RegistraLog(new Log(person.LoginUser, JsonConvert.SerializeObject(person), null, "Delete"));
             _usuarioService.Remove(person.Id);
 
             return NoContent();

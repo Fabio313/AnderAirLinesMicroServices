@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using APIAirportDapper.Config;
 using Dapper;
 using Models;
@@ -35,7 +31,7 @@ namespace APIAirportDapper.Repository
 
         public List<Airport> GetAll()
         {
-            using(var db = new SqlConnection(_conn))
+            using (var db = new SqlConnection(_conn))
             {
                 db.Open();
                 var airports = db.Query<Airport>(Airport.SELECTALL);
@@ -57,7 +53,7 @@ namespace APIAirportDapper.Repository
                 {
                     return null;
                 }
-                
+
             }
         }
     }

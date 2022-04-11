@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading.Tasks;
 using APIPassagem.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using Models.Services;
 using Newtonsoft.Json;
 
 namespace APIPassagem.Controllers
@@ -40,62 +39,69 @@ namespace APIPassagem.Controllers
         [HttpPost]
         public async Task<ActionResult<Passagem>> CreateAsync(Passagem passagem)
         {
-
-            HttpClient APIConnection = new HttpClient();
             try
             {
-                HttpResponseMessage buscavoo = await APIConnection.GetAsync("https://localhost:44307/api/Voo/busca?siglaorigem=" + passagem.Voo.Origem.Sigla + "&sigladestino=" + passagem.Voo.Destino.Sigla);
-                var voo = JsonConvert.DeserializeObject<Voo>(await buscavoo.Content.ReadAsStringAsync());
-                if (voo.Origem == null || voo.Destino == null)
-                    return NotFound("Não existe voo com as informações fornecidas escolhido!");
+                var usuario = await ConsultaAPI.BuscaUsuarioAsync(passagem.LoginUser);
+                if (usuario.Login == null)
+                    return NotFound("Este usuario não existe");
+                if (usuario.Funcao.Nome != "Administrador" && usuario.Funcao.Nome != "Atendente")
+                    return BadRequest("Este usuario nao tem autorização para cadastrar precobase");
+            }
+            catch
+            {
+                return NotFound("API DE USUARIOS ESTA FORA DO AR");
+            }
+            try
+            {
+                var voo = await ConsultaAPI.BuscaVooAsync(passagem.Voo.Origem.Sigla, passagem.Voo.Destino.Sigla);
+                if (voo == null)
+                    return NotFound("Não existe voo com estas informaçoes");
                 passagem.Voo = voo;
             }
             catch
             {
-                return NotFound("API DOS VOOS ESTA FORA DO AR");
+                return StatusCode(408, "API DOS VOOS ESTA FORA DO AR");
             }
 
             try
             {
-                HttpResponseMessage buscapassageiro = await APIConnection.GetAsync("https://localhost:44340/api/Passageiro/busca?cpf=" + passagem.Passageiro.Cpf);
-                var passageiro = JsonConvert.DeserializeObject<Passageiro>(await buscapassageiro.Content.ReadAsStringAsync());
-                if (passageiro.Cpf == null)
-                    return NotFound("Não existe passageiro com este cpf!");
+                var passageiro = await ConsultaAPI.BuscaPassageiroAsync(passagem.Passageiro.Cpf);
+                if (passageiro == null)
+                    return NotFound("Não existe passageiro com este cpf");
                 passagem.Passageiro = passageiro;
             }
             catch
             {
-                return NotFound("API DOS PASSAGEIROS ESTA FORA DO AR");
+                return StatusCode(408, "API DE PASSAGEIROS FORA DE AR!");
             }
 
             try
             {
-                HttpResponseMessage buscaclasse = await APIConnection.GetAsync("https://localhost:44305/api/Aeronave/busca?descricao=" + passagem.Classe.Descricao);
-                var classe = JsonConvert.DeserializeObject<Classe>(await buscaclasse.Content.ReadAsStringAsync());
-                if (classe.Descricao == null)
-                    return NotFound("Não existe classe com esta descricao!");
+                var classe = await ConsultaAPI.BuscaClasseAsync(passagem.Classe.Descricao);
+                if (classe == null)
+                    return NotFound("Não existe classse com esta descricao");
                 passagem.Classe = classe;
             }
             catch
             {
-                return NotFound("API DAS CLASSES ESTA FORA DO AR");
+                return StatusCode(408, "API DAS CLASSES ESTA FORA DO AR");
             }
 
             try
             {
-                HttpResponseMessage buscaprecobase = await APIConnection.GetAsync("https://localhost:44364/api/PrecoBase/busca?siglaorigem=" + passagem.Voo.Origem.Sigla + "&sigladestino=" + passagem.Voo.Destino.Sigla);
-                var precobase = JsonConvert.DeserializeObject<PrecoBase>(await buscaprecobase.Content.ReadAsStringAsync());
-                if (precobase.Origem == null || precobase.Destino == null)
-                    return NotFound("Não existe preco base com origem e destino do voo escolhido!");
-                passagem.PrecoBase = precobase;
+                var precoBase = await ConsultaAPI.BuscaPrecoBaseAsync(passagem.PrecoBase.Origem.Sigla, passagem.PrecoBase.Destino.Sigla);
+                if (precoBase == null)
+                    return NotFound("Não existe um prec=ço base para esta viagem");
+                passagem.PrecoBase = precoBase;
             }
             catch
             {
-                return NotFound("API DOS PRECOS BASES DO AR");
+                return StatusCode(408, "API DOS PRECOS BASES DO AR");
             }
 
             passagem.ValorTotal = (passagem.PrecoBase.Valor * ((passagem.Classe.Valor - 100) / 100) * -1) * (((passagem.PromocaoPorcentagem - 100) / 100) * -1);
 
+            ConsultaAPI.RegistraLog(new Log(passagem.LoginUser, null, JsonConvert.SerializeObject(passagem), "Create"));
             _passagemService.Create(passagem);
 
             return CreatedAtRoute("GetCliente", new { id = passagem.Id.ToString() }, passagem);
@@ -111,6 +117,7 @@ namespace APIPassagem.Controllers
                 return NotFound();
             }
 
+            ConsultaAPI.RegistraLog(new Log(personIn.LoginUser, JsonConvert.SerializeObject(cliente), JsonConvert.SerializeObject(personIn), "Update"));
             _passagemService.Update(id, personIn);
 
             return NoContent();
@@ -126,6 +133,7 @@ namespace APIPassagem.Controllers
                 return NotFound();
             }
 
+            ConsultaAPI.RegistraLog(new Log(person.LoginUser, JsonConvert.SerializeObject(person), null, "Delete"));
             _passagemService.Remove(person.Id);
 
             return NoContent();

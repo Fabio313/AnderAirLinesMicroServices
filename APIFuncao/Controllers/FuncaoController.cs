@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using APIFuncao.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 
@@ -36,9 +35,9 @@ namespace APIFuncao.Controllers
         }
 
         [HttpGet("busca")]
-        public ActionResult<Funcao> GetUsuarioLogin(string login)
+        public ActionResult<Funcao> GetFuncaoNome(string nome)
         {
-            var cliente = _usuarioService.GetNome(login);
+            var cliente = _usuarioService.GetNome(nome);
 
             if (cliente == null)
             {

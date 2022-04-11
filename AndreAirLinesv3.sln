@@ -23,7 +23,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APIAirportDapper", "APIAirp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APIUsuarios", "APIUsuarios\APIUsuarios.csproj", "{C4D802AE-D3EA-4BFB-9B7B-52FD43C07BB9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "APIFuncao", "APIFuncao\APIFuncao.csproj", "{5B2D7772-1C08-4FAD-A5E2-A8728F66C67D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APIFuncao", "APIFuncao\APIFuncao.csproj", "{5B2D7772-1C08-4FAD-A5E2-A8728F66C67D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APILog", "APILog\APILog.csproj", "{10168002-214B-4D62-82FF-9C26F0CA8A92}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVCAndreAirLines", "MVCAndreAirLines\MVCAndreAirLines.csproj", "{7BA18DB9-16A1-4E9E-825A-78E7064C7591}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +79,14 @@ Global
 		{5B2D7772-1C08-4FAD-A5E2-A8728F66C67D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B2D7772-1C08-4FAD-A5E2-A8728F66C67D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B2D7772-1C08-4FAD-A5E2-A8728F66C67D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10168002-214B-4D62-82FF-9C26F0CA8A92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10168002-214B-4D62-82FF-9C26F0CA8A92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10168002-214B-4D62-82FF-9C26F0CA8A92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10168002-214B-4D62-82FF-9C26F0CA8A92}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BA18DB9-16A1-4E9E-825A-78E7064C7591}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BA18DB9-16A1-4E9E-825A-78E7064C7591}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BA18DB9-16A1-4E9E-825A-78E7064C7591}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BA18DB9-16A1-4E9E-825A-78E7064C7591}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

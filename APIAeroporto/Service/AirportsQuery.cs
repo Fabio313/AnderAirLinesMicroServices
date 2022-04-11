@@ -10,7 +10,7 @@ namespace APIAeroporto.Service
         static readonly HttpClient client = new HttpClient();
         public static async Task<Airport> GetAirportAsync(string code)
         {
-            HttpResponseMessage response = await client.GetAsync("https://localhost:44315/api/Airport/"+code);
+            HttpResponseMessage response = await client.GetAsync("https://localhost:44315/api/Airport/" + code);
             response.EnsureSuccessStatusCode();
             string responseBody = await response.Content.ReadAsStringAsync();
             var airport = JsonConvert.DeserializeObject<Airport>(responseBody);

@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading.Tasks;
 using APIVoo.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using Models.Services;
 using Newtonsoft.Json;
 
 namespace APIVoo.Controllers
@@ -55,48 +54,49 @@ namespace APIVoo.Controllers
         [HttpPost]
         public async Task<ActionResult<Voo>> CreateAsync(Voo voo)
         {
-            HttpClient APIConnection = new HttpClient();
             try
             {
-
-                HttpResponseMessage aeroporto = await APIConnection.GetAsync("https://localhost:44321/api/Aeroporto/busca?sigla=" + voo.Origem.Sigla);
-                var origem = JsonConvert.DeserializeObject<Aeroporto>(await aeroporto.Content.ReadAsStringAsync());
-
-                if (origem.Sigla == null)
-                    return NotFound("Não existe aeroporto com a sigla de origem escolhida!");
-                voo.Origem = origem;
+                var usuario = await ConsultaAPI.BuscaUsuarioAsync(voo.LoginUser);
+                if (usuario.Login == null)
+                    return NotFound("Este usuario não existe");
+                if (usuario.Funcao.Nome != "Administrador" && usuario.Funcao.Nome != "Atendente")
+                    return BadRequest("Este usuario nao tem autorização para cadastrar precobase");
             }
             catch
             {
-                return NotFound("API DOS AEROPORTOS ESTA FORA DO AR");
+                StatusCode(408, "API DE USUARIOS ESTA FORA DO AR");
             }
 
             try
             {
-                HttpResponseMessage aeroporto = await APIConnection.GetAsync("https://localhost:44321/api/Aeroporto/busca?sigla=" + voo.Destino.Sigla);
-                var destino = JsonConvert.DeserializeObject<Aeroporto>(await aeroporto.Content.ReadAsStringAsync());
-                if (destino.Sigla == null)
+                var origem = await ConsultaAPI.BuscaAeroportoAsync(voo.Origem.Sigla);
+                if (origem == null)
+                    return NotFound("Não existe aeroporto com a sigla de origem escolhida!");
+                voo.Origem = origem;
+
+                var destino = await ConsultaAPI.BuscaAeroportoAsync(voo.Destino.Sigla);
+                if (destino == null)
                     return NotFound("Não existe aeroporto com a sigla de destino escolhida!");
                 voo.Destino = destino;
             }
             catch
             {
-                return NotFound("API DOS AEROPORTOS ESTA FORA DO AR");
+                return StatusCode(408, "API DOS AEROPORTOS ESTA FORA DO AR");
             }
 
             try
             {
-                HttpResponseMessage aeronave = await APIConnection.GetAsync("https://localhost:44359/api/Aeronave/busca?codigo=" + voo.Aeronave.Codigo);
-                var aeronaveobject = JsonConvert.DeserializeObject<Aeronave>(await aeronave.Content.ReadAsStringAsync());
-                if (aeronaveobject.Codigo == null)
-                    return NotFound("Não existe aeronave com o codigo procurado!");
-                voo.Aeronave = aeronaveobject;
+                var aeronave = await ConsultaAPI.BuscaAeronaveAsync(voo.Aeronave.Codigo);
+                if (aeronave == null)
+                    return NotFound("Não existe aeronave com codigo escrito");
+                voo.Aeronave = aeronave;
             }
             catch
             {
-                return NotFound("API DOS AEROPORTOS ESTA FORA DO AR");
+                return StatusCode(408, "API DAS AERONAVES ESTA FORA DO AR");
             }
 
+            ConsultaAPI.RegistraLog(new Log(voo.LoginUser, null, JsonConvert.SerializeObject(voo), "Create"));
             _vooService.Create(voo);
 
             return CreatedAtRoute("GetCliente", new { id = voo.Id.ToString() }, voo);
@@ -112,6 +112,7 @@ namespace APIVoo.Controllers
                 return NotFound();
             }
 
+            ConsultaAPI.RegistraLog(new Log(personIn.LoginUser, JsonConvert.SerializeObject(cliente), JsonConvert.SerializeObject(personIn), "Update"));
             _vooService.Update(id, personIn);
 
             return NoContent();
@@ -127,6 +128,7 @@ namespace APIVoo.Controllers
                 return NotFound();
             }
 
+            ConsultaAPI.RegistraLog(new Log(person.LoginUser, JsonConvert.SerializeObject(person), null, "Delete"));
             _vooService.Remove(person.Id);
 
             return NoContent();

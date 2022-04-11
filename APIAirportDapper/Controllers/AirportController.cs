@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using APIAirportDapper.Service;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 

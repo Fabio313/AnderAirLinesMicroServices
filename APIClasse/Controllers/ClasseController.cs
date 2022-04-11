@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using APIClasse.Service;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 
@@ -9,11 +8,11 @@ namespace APIClasse.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AeronaveController : ControllerBase
+    public class ClasseController : ControllerBase
     {
         private readonly ClasseService _classeService;
 
-        public AeronaveController(ClasseService personService)
+        public ClasseController(ClasseService personService)
         {
             _classeService = personService;
         }

@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading.Tasks;
 using APIAeronave.Service;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using Models.Services;
 using Newtonsoft.Json;
 
 namespace APIAeronave.Controllers
@@ -53,30 +52,28 @@ namespace APIAeronave.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Aeronave>> CreateAsync(Aeronave person)
+        public async Task<ActionResult<Aeronave>> CreateAsync(Aeronave aeronave)
         {
-            HttpClient APIConnection = new HttpClient();
             try
             {
-                HttpResponseMessage user = await APIConnection.GetAsync("https://localhost:44385/api/Usuario/busca?login=" + person.LoginUser);
-                var usuario = JsonConvert.DeserializeObject<Usuario>(await user.Content.ReadAsStringAsync());
-
-                if (usuario == null)
+                var usuario = await ConsultaAPI.BuscaUsuarioAsync(aeronave.LoginUser);
+                if (usuario.Login == null)
                     return NotFound("Este usuario não existe");
                 if (usuario.Funcao.Nome != "Administrador")
-                    return BadRequest("Este usuario nao tem autorização para cadastrar usuarios");
-                ;
+                    return BadRequest("Este usuario nao tem autorização para cadastrar precobase");
             }
             catch
             {
                 return NotFound("API DE USUARIOS ESTA FORA DO AR");
             }
-            if (!CodigoService.VerificaAeronaveSigla(person.Codigo, _aeronaveService))
+
+            if (!CodigoService.VerificaAeronaveSigla(aeronave.Codigo, _aeronaveService))
                 return BadRequest("Já existe aeronave com a sigla digitada");
 
-            _aeronaveService.Create(person);
+            ConsultaAPI.RegistraLog(new Log(aeronave.LoginUser, null, JsonConvert.SerializeObject(aeronave), "Create"));
+            _aeronaveService.Create(aeronave);
 
-            return CreatedAtRoute("GetCliente", new { id = person.Id.ToString() }, person);
+            return CreatedAtRoute("GetCliente", new { id = aeronave.Id.ToString() }, aeronave);
         }
 
         [HttpPut("{id:length(24)}")]
@@ -89,7 +86,9 @@ namespace APIAeronave.Controllers
                 return NotFound();
             }
 
+            ConsultaAPI.RegistraLog(new Log(personIn.LoginUser, JsonConvert.SerializeObject(cliente), JsonConvert.SerializeObject(personIn), "Update"));
             _aeronaveService.Update(id, personIn);
+
 
             return NoContent();
         }
@@ -104,6 +103,7 @@ namespace APIAeronave.Controllers
                 return NotFound();
             }
 
+            ConsultaAPI.RegistraLog(new Log(person.LoginUser, JsonConvert.SerializeObject(person), null, "Delete"));
             _aeronaveService.Remove(person.Id);
 
             return NoContent();

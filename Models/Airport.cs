@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Models
+﻿namespace Models
 {
     public class Airport
     {
@@ -31,9 +25,9 @@ namespace Models
 
         public override string ToString()
         {
-            return "Id: "+ Id + 
-                   "\nCity: "+ City +
-                   "\nCountry: " + Country + 
+            return "Id: " + Id +
+                   "\nCity: " + City +
+                   "\nCountry: " + Country +
                    "\nContinent: " + Continent;
         }
     }

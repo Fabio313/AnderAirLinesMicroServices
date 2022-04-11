@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -16,7 +15,7 @@ namespace Models.Services
                 HttpResponseMessage response = await client.GetAsync("https://viacep.com.br/ws/" + cep + "/json");
                 response.EnsureSuccessStatusCode();
                 string responseBody = await response.Content.ReadAsStringAsync();
-                var endereco =JsonConvert.DeserializeObject<Endereco>(responseBody);
+                var endereco = JsonConvert.DeserializeObject<Endereco>(responseBody);
 
                 return endereco;
             }

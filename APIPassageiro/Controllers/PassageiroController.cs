@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.Services;
+using Newtonsoft.Json;
 
 namespace APIPassageiro.Controllers
 {
@@ -49,24 +49,38 @@ namespace APIPassageiro.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Passageiro>> CreateAsync(Passageiro person)
+        public async Task<ActionResult<Passageiro>> CreateAsync(Passageiro passageiro)
         {
-            if (!CPFService.ValidaCPF(person.Cpf, _passageiroService))
-                return BadRequest("CPF Inválido!");
-            if (!CPFService.VerificaPassageiroCPF(person.Cpf, _passageiroService))
-                return BadRequest("Passageiro ja cadastrado");
-
-            var end = await VerificaCep.CEPVerify(person.Endereco.Cep);
-            if (end.Localidade != null)
+            try
             {
-                int num = person.Endereco.Numero;
-                person.Endereco = new Endereco(end.Localidade, end.Logradouro, end.Bairro, end.Uf, end.Complemento, end.Cep);
-                person.Endereco.Numero = num;
+                var usuario = await ConsultaAPI.BuscaUsuarioAsync(passageiro.LoginUser);
+                if (usuario.Login == null)
+                    return NotFound("Este usuario não existe");
+                if (usuario.Funcao.Nome != "Administrador" && usuario.Funcao.Nome != "Atendente")
+                    return BadRequest("Este usuario nao tem autorização para cadastrar precobase");
+            }
+            catch
+            {
+                return NotFound("API DE USUARIOS ESTA FORA DO AR");
             }
 
-            _passageiroService.Create(person);
+            if (!CPFService.ValidaCPF(passageiro.Cpf, _passageiroService))
+                return BadRequest("CPF Inválido!");
+            if (!CPFService.VerificaPassageiroCPF(passageiro.Cpf, _passageiroService))
+                return BadRequest("Passageiro ja cadastrado");
 
-            return CreatedAtRoute("GetCliente", new { id = person.Id.ToString() }, person);
+            var end = await VerificaCep.CEPVerify(passageiro.Endereco.Cep);
+            if (end.Localidade != null)
+            {
+                int num = passageiro.Endereco.Numero;
+                passageiro.Endereco = new Endereco(end.Localidade, end.Logradouro, end.Bairro, end.Uf, end.Complemento, end.Cep);
+                passageiro.Endereco.Numero = num;
+            }
+
+            ConsultaAPI.RegistraLog(new Log(passageiro.LoginUser, null, JsonConvert.SerializeObject(passageiro), "Create"));
+            _passageiroService.Create(passageiro);
+
+            return CreatedAtRoute("GetCliente", new { id = passageiro.Id.ToString() }, passageiro);
         }
 
         [HttpPut("{id:length(24)}")]
@@ -79,6 +93,7 @@ namespace APIPassageiro.Controllers
                 return NotFound();
             }
 
+            ConsultaAPI.RegistraLog(new Log(personIn.LoginUser, JsonConvert.SerializeObject(cliente), JsonConvert.SerializeObject(personIn), "Update"));
             _passageiroService.Update(id, personIn);
 
             return NoContent();
@@ -94,6 +109,7 @@ namespace APIPassageiro.Controllers
                 return NotFound();
             }
 
+            ConsultaAPI.RegistraLog(new Log(person.LoginUser, JsonConvert.SerializeObject(person), null, "Delete"));
             _passageiroService.Remove(person.Id);
 
             return NoContent();
