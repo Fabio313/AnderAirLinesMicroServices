@@ -1,5 +1,7 @@
 ﻿
 
+using APIUsuarios.Service;
+
 namespace APIUsuarios.Services
 {
     public class LoginService

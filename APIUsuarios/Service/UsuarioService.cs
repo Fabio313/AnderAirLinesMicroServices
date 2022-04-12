@@ -3,7 +3,7 @@ using APIUsuarios.Utils;
 using Models;
 using MongoDB.Driver;
 
-namespace APIUsuarios.Services
+namespace APIUsuarios.Service
 {
     public class UsuarioService
     {

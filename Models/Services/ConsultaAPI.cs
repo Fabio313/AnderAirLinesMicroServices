@@ -75,6 +75,14 @@ namespace Models.Services
                 return null;
             return usuario;
         }
+        public static async Task<List<Usuario>> BuscaUsuariosAsync()
+        {
+            GetRestposta = await APIConnection.GetAsync("https://localhost:44385/api/Usuario");
+            var usuario = JsonConvert.DeserializeObject<List<Usuario>>(await GetRestposta.Content.ReadAsStringAsync());
+            if (usuario == null)
+                return null;
+            return usuario;
+        }
         public static async Task<Funcao> BuscaFuncaoAsync(string funcao)
         {
             GetRestposta = await APIConnection.GetAsync("https://localhost:44386/api/Funcao/busca?nome=" + funcao);

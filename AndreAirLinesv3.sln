@@ -29,6 +29,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APILog", "APILog\APILog.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MVCAndreAirLines", "MVCAndreAirLines\MVCAndreAirLines.csproj", "{7BA18DB9-16A1-4E9E-825A-78E7064C7591}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TesteUsuario", "TesteUsuario\TesteUsuario.csproj", "{9BD0F857-03E2-43BC-A37E-1C7B2505DCDF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestPassagem", "TestPassagem\TestPassagem.csproj", "{E6276BF3-F990-4DD2-891A-613E7CF21390}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +91,14 @@ Global
 		{7BA18DB9-16A1-4E9E-825A-78E7064C7591}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7BA18DB9-16A1-4E9E-825A-78E7064C7591}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7BA18DB9-16A1-4E9E-825A-78E7064C7591}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BD0F857-03E2-43BC-A37E-1C7B2505DCDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BD0F857-03E2-43BC-A37E-1C7B2505DCDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BD0F857-03E2-43BC-A37E-1C7B2505DCDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BD0F857-03E2-43BC-A37E-1C7B2505DCDF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6276BF3-F990-4DD2-891A-613E7CF21390}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6276BF3-F990-4DD2-891A-613E7CF21390}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6276BF3-F990-4DD2-891A-613E7CF21390}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6276BF3-F990-4DD2-891A-613E7CF21390}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
