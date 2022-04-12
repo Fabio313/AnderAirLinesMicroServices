@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using APIVoo.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.Services;
@@ -21,10 +22,12 @@ namespace APIVoo.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "GetVoo")]
         public ActionResult<List<Voo>> Get() =>
             _vooService.Get();
 
         [HttpGet("{id:length(24)}", Name = "GetCliente")]
+        [Authorize(Roles = "GetIdVoo")]
         public ActionResult<Voo> Get(string id)
         {
             var cliente = _vooService.Get(id);
@@ -52,6 +55,7 @@ namespace APIVoo.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "PostVoo")]
         public async Task<ActionResult<Voo>> CreateAsync(Voo voo)
         {
             try
@@ -103,6 +107,7 @@ namespace APIVoo.Controllers
         }
 
         [HttpPut("{id:length(24)}")]
+        [Authorize(Roles = "PutVoo")]
         public IActionResult Update(string id, Voo personIn)
         {
             var cliente = _vooService.Get(id);
@@ -119,6 +124,7 @@ namespace APIVoo.Controllers
         }
 
         [HttpDelete("{id:length(24)}")]
+        [Authorize(Roles = "DeleteVoo")]
         public IActionResult Delete(string id)
         {
             var person = _vooService.Get(id);

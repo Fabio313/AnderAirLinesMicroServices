@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using APIFuncao.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 
@@ -18,10 +19,12 @@ namespace APIFuncao.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "GetFuncao")]
         public ActionResult<List<Funcao>> Get() =>
             _usuarioService.Get();
 
         [HttpGet("{id:length(24)}", Name = "GetCliente")]
+        [Authorize(Roles = "GetIdFuncao")]
         public ActionResult<Funcao> Get(string id)
         {
             var cliente = _usuarioService.Get(id);
@@ -49,6 +52,7 @@ namespace APIFuncao.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "PostFuncao")]
         public ActionResult<Funcao> Create(Funcao person)
         {
             if (!NomeService.VerificaFuncaoNome(person.Nome, _usuarioService))
@@ -60,6 +64,7 @@ namespace APIFuncao.Controllers
         }
 
         [HttpPut("{id:length(24)}")]
+        [Authorize(Roles = "PutFuncao")]
         public IActionResult Update(string id, Funcao personIn)
         {
             var cliente = _usuarioService.Get(id);
@@ -75,6 +80,7 @@ namespace APIFuncao.Controllers
         }
 
         [HttpDelete("{id:length(24)}")]
+        [Authorize(Roles = "DeleteFuncao")]
         public IActionResult Delete(string id)
         {
             var person = _usuarioService.Get(id);

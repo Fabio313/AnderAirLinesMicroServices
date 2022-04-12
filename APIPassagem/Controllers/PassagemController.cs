@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using APIPassagem.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.Services;
@@ -20,10 +21,12 @@ namespace APIPassagem.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "GetPassagem")]
         public ActionResult<List<Passagem>> Get() =>
             _passagemService.Get();
 
         [HttpGet("{id:length(24)}", Name = "GetCliente")]
+        [Authorize(Roles = "GetIdPassagem")]
         public ActionResult<Passagem> Get(string id)
         {
             var cliente = _passagemService.Get(id);
@@ -37,6 +40,7 @@ namespace APIPassagem.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "PostPassagem")]
         public async Task<ActionResult<Passagem>> CreateAsync(Passagem passagem)
         {
             try
@@ -108,6 +112,7 @@ namespace APIPassagem.Controllers
         }
 
         [HttpPut("{id:length(24)}")]
+        [Authorize(Roles = "PutPassagem")]
         public IActionResult Update(string id, Passagem personIn)
         {
             var cliente = _passagemService.Get(id);
@@ -124,6 +129,7 @@ namespace APIPassagem.Controllers
         }
 
         [HttpDelete("{id:length(24)}")]
+        [Authorize(Roles = "DeletePassagem")]
         public IActionResult Delete(string id)
         {
             var person = _passagemService.Get(id);

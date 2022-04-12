@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using APILog.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.Services;
@@ -19,6 +20,7 @@ namespace APILog.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "GetLog")]
         public ActionResult<List<Log>> Get() =>
             _logService.Get();
 

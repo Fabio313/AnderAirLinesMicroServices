@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using APIAeroporto.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.Services;
@@ -21,10 +22,12 @@ namespace APIAeroporto.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "GetAeroporto")]
         public ActionResult<List<Aeroporto>> Get() =>
             _aeroportoService.Get();
 
         [HttpGet("{id:length(24)}", Name = "GetCliente")]
+        [Authorize(Roles = "GetIdAeroporto")]
         public ActionResult<Aeroporto> Get(string id)
         {
             var cliente = _aeroportoService.Get(id);
@@ -52,6 +55,7 @@ namespace APIAeroporto.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "PostAeroporto")]
         public async Task<ActionResult<Aeroporto>> CreateAsync(Aeroporto aeroporto)
         {
             try
@@ -93,6 +97,7 @@ namespace APIAeroporto.Controllers
         }
 
         [HttpPut("{id:length(24)}")]
+        [Authorize(Roles = "PutAeroporto")]
         public IActionResult Update(string id, Aeroporto personIn)
         {
             var cliente = _aeroportoService.Get(id);
@@ -109,6 +114,7 @@ namespace APIAeroporto.Controllers
         }
 
         [HttpDelete("{id:length(24)}")]
+        [Authorize(Roles = "DeleteAeroporto")]
         public IActionResult Delete(string id)
         {
             var person = _aeroportoService.Get(id);

@@ -27,7 +27,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APIFuncao", "APIFuncao\APIF
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APILog", "APILog\APILog.csproj", "{10168002-214B-4D62-82FF-9C26F0CA8A92}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVCAndreAirLines", "MVCAndreAirLines\MVCAndreAirLines.csproj", "{7BA18DB9-16A1-4E9E-825A-78E7064C7591}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MVCAndreAirLines", "MVCAndreAirLines\MVCAndreAirLines.csproj", "{7BA18DB9-16A1-4E9E-825A-78E7064C7591}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

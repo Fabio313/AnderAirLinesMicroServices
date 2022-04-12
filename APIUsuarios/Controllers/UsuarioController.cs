@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using APIUsuarios.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.Services;
@@ -21,10 +22,12 @@ namespace APIUsuarios.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "GetUsuario")]
         public ActionResult<List<Usuario>> Get() =>
             _usuarioService.Get();
 
         [HttpGet("{id:length(24)}", Name = "GetCliente")]
+        [Authorize(Roles = "GetIdUsuario")]
         public ActionResult<Usuario> Get(string id)
         {
             var cliente = _usuarioService.Get(id);
@@ -52,6 +55,7 @@ namespace APIUsuarios.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "PostUsuario")]
         public async Task<ActionResult<Usuario>> CreateAsync(Usuario usuario)
         {
             try
@@ -97,6 +101,7 @@ namespace APIUsuarios.Controllers
         }
 
         [HttpPut("{id:length(24)}")]
+        [Authorize(Roles = "PutUsuario")]
         public IActionResult Update(string id, Usuario personIn)
         {
             var cliente = _usuarioService.Get(id);
@@ -113,6 +118,7 @@ namespace APIUsuarios.Controllers
         }
 
         [HttpDelete("{id:length(24)}")]
+        [Authorize(Roles = "DeleteUsuario")]
         public IActionResult Delete(string id)
         {
             var person = _usuarioService.Get(id);

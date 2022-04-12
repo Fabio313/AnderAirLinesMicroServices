@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using APIClasse.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 
@@ -18,10 +19,12 @@ namespace APIClasse.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "GetClasse")]
         public ActionResult<List<Classe>> Get() =>
             _classeService.Get();
 
         [HttpGet("{id:length(24)}", Name = "GetCliente")]
+        [Authorize(Roles = "GetIdClasse")]
         public ActionResult<Classe> Get(string id)
         {
             var cliente = _classeService.Get(id);
@@ -49,6 +52,7 @@ namespace APIClasse.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "PostClasse")]
         public ActionResult<Classe> Create(Classe person)
         {
 
@@ -58,6 +62,7 @@ namespace APIClasse.Controllers
         }
 
         [HttpPut("{id:length(24)}")]
+        [Authorize(Roles = "PutClasse")]
         public IActionResult Update(string id, Classe personIn)
         {
             var cliente = _classeService.Get(id);
@@ -73,6 +78,7 @@ namespace APIClasse.Controllers
         }
 
         [HttpDelete("{id:length(24)}")]
+        [Authorize(Roles = "DeleteClasse")]
         public IActionResult Delete(string id)
         {
             var person = _classeService.Get(id);

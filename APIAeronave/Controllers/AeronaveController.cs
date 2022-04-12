@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using APIAeronave.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.Services;
@@ -21,10 +22,12 @@ namespace APIAeronave.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "GetAeronave")]
         public ActionResult<List<Aeronave>> Get() =>
             _aeronaveService.Get();
 
         [HttpGet("{id:length(24)}", Name = "GetCliente")]
+        [Authorize(Roles = "GetIdAeronave")]
         public ActionResult<Aeronave> Get(string id)
         {
             var cliente = _aeronaveService.Get(id);
@@ -38,6 +41,7 @@ namespace APIAeronave.Controllers
         }
 
         [HttpGet("busca")]
+
         public ActionResult<Aeronave> GetPassageiroCPF(string codigo)
         {
             var cliente = _aeronaveService.GetCodigo(codigo);
@@ -52,6 +56,33 @@ namespace APIAeronave.Controllers
         }
 
         [HttpPost]
+        [Route("login")]
+        [AllowAnonymous]
+        public async Task<ActionResult<dynamic>> Authenticate([FromBody] Usuario model)
+        {
+            // Recupera o usuário
+            var user =  await ConsultaAPI.BuscaUsuarioAsync(model.Login);
+
+            // Verifica se o usuário existe
+            if (user.Login == null)
+                return NotFound(new { message = "Usuário inválidos" });
+
+            // Gera o Token
+            var token = TokenService.GenerateToken(user);
+
+            // Oculta a senha
+            user.Senha = "";
+
+            // Retorna os dados
+            return new
+            {
+                user = user,
+                token = token
+            };
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "PostAeronave")]
         public async Task<ActionResult<Aeronave>> CreateAsync(Aeronave aeronave)
         {
             try
@@ -77,6 +108,7 @@ namespace APIAeronave.Controllers
         }
 
         [HttpPut("{id:length(24)}")]
+        [Authorize(Roles = "PutAeronave")]
         public IActionResult Update(string id, Aeronave personIn)
         {
             var cliente = _aeronaveService.Get(id);
@@ -94,6 +126,7 @@ namespace APIAeronave.Controllers
         }
 
         [HttpDelete("{id:length(24)}")]
+        [Authorize(Roles = "DeleteAeronave")]
         public IActionResult Delete(string id)
         {
             var person = _aeronaveService.Get(id);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using APIPrecoBase.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.Services;
@@ -21,10 +22,12 @@ namespace APIPrecoBase.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "GetPrecoBase")]
         public ActionResult<List<PrecoBase>> Get() =>
             _precoBaseService.Get();
 
         [HttpGet("{id:length(24)}", Name = "GetCliente")]
+        [Authorize(Roles = "GetIdPrecoBase")]
         public ActionResult<PrecoBase> Get(string id)
         {
             var cliente = _precoBaseService.Get(id);
@@ -52,6 +55,7 @@ namespace APIPrecoBase.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "PostPrecoBase")]
         public async Task<ActionResult<PrecoBase>> CreateAsync(PrecoBase precobase)
         {
             try
@@ -91,6 +95,7 @@ namespace APIPrecoBase.Controllers
         }
 
         [HttpPut("{id:length(24)}")]
+        [Authorize(Roles = "PutPrecoBase")]
         public IActionResult Update(string id, PrecoBase personIn)
         {
             var cliente = _precoBaseService.Get(id);
@@ -107,6 +112,7 @@ namespace APIPrecoBase.Controllers
         }
 
         [HttpDelete("{id:length(24)}")]
+        [Authorize(Roles = "DeletePrecoBase")]
         public IActionResult Delete(string id)
         {
             var person = _precoBaseService.Get(id);
