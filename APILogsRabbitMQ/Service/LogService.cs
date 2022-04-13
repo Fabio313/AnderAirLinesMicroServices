@@ -1,18 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using APILog.Utils;
+using APILogsRabbitMQ.Utils;
 using Models;
 using MongoDB.Driver;
 using Newtonsoft.Json;
-using RabbitMQ.Client;
 
-namespace APILog.Services
+namespace APILogsRabbitMQ.Services
 {
     public class LogService
     {
         private readonly IMongoCollection<Log> _log;
-        private readonly ConnectionFactory _factory = new ConnectionFactory { HostName = "localhost"};
-        private const string QUEUE_NAME = "messagelogs";
 
         public LogService(IProjMongoDotnetDatabaseSettings settings)
         {
@@ -29,30 +26,7 @@ namespace APILog.Services
 
         public Log Create(Log cliente)
         {
-            using (var connection = _factory.CreateConnection())
-            {
-                using (var channel = connection.CreateModel())
-                {
-
-                    channel.QueueDeclare(
-                        queue: QUEUE_NAME,
-                        durable: false,
-                        exclusive: false,
-                        autoDelete: false,
-                        arguments: null
-                        );
-
-                    var stringfieldMessage = JsonConvert.SerializeObject(cliente);
-                    var bytesMessage = Encoding.UTF8.GetBytes(stringfieldMessage);
-
-                    channel.BasicPublish(
-                        exchange: "",
-                        routingKey: QUEUE_NAME,
-                        basicProperties: null,
-                        body: bytesMessage
-                        );
-                }
-            }
+            _log.InsertOne(cliente);
             return cliente;
         }
 

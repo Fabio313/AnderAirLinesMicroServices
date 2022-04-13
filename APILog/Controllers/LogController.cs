@@ -51,6 +51,7 @@ namespace APILog.Controllers
                 return StatusCode(408, "API DE USUARIOS ESTA FORA DO AR");
             }
 
+
             _logService.Create(log);
 
             return CreatedAtRoute("GetCliente", new { id = log.Id.ToString() }, log);
