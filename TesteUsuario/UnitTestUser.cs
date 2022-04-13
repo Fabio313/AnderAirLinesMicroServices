@@ -56,7 +56,7 @@ namespace TesteUsuario
             var user = _usuarioService.Get(id);
             _usuarioService.Update(id, new Usuario());
             var newuser = _usuarioService.Get(user.Id);
-            //se mudou a passagem
+            //se mudou a passageiro
             Assert.Equal(user.Login, newuser.Login);
         }
 
